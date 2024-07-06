@@ -1,3 +1,6 @@
+let postUserPointsAPI = 'http://localhost:4000/api/engagements/points/update-points'
+let jwtToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zYWZ5YW4xMDAwQGdtYWlsLmNvbSIsInN1YiI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzIwMTk0Mzk1LCJleHAiOjE3MjI3ODYzOTV9.DXUTC4B4_B-sQPynyqvzcyckP7LxGy2ZvvPzvCjdA1DtWxpheU-31jWZoP0yqFuDgj3yB6a7BSPurJpGTL31xHo9j8EtqAd0m1fjHMNenhOZVuzxXOt2hZMp6GHHycjAkPAXGxH2isGhKzs9loCLaEU1uqZSP5A6v2gKZvV0HcVGtU3p5XkYUf1DI8B6dV-j8TIWL1NtE3LUDVKNmmT_todhmKuuOd7Ki_aEo3B-2bWn1BCwfKfpqv0ThWDfUyGodYQXJbVkAh2KpVrVgzt3x1I-aCxTuK0403PPpZis983jlBKSPQu33WF3zIdf3zPVE5hOd1heFKxvlhd9VIBizQ'; 
+
 window.addEventListener('load', function() {
   console.log('Page fully loaded. Running content script.');
   
@@ -35,6 +38,7 @@ function findText() {
         console.log(result);
         let pointsData = JSON.parse(JSON.stringify(result.pointsData));
         console.log("Points----"+JSON.stringify(pointsData));
+        postData(pointsData);
         });
       }
     });
@@ -58,7 +62,7 @@ function navigateAndExtract(users) {
 
     pointsData = JSON.parse(JSON.stringify(result.pointsData));
     
-    const newpoints = {userId : user.userId , points : 0}
+    const newpoints = {userId : user.userId , points : 0 , reason :"facebookpoints"}
 
     pointsData.push(newpoints)
 
@@ -104,3 +108,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
 });
+function postData(data) {
+  fetch(postUserPointsAPI, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${jwtToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
+  })
+  .then(responseData => {
+    console.log('Data posted successfully:', responseData);
+  })
+  .catch(error => {
+    console.error('Error posting data:', error);
+  });
+}
