@@ -17,12 +17,25 @@ function findText() {
 
   if (node) {
     console.log(`Extracted text for ID:`, node.innerText);
-    alert(node.innerText);
-    
-    chrome.storage.local.get(['ids'], (result) => {
-      const ids = result.ids || [];
-      if (ids.length > 0) {
-        navigateAndExtract(ids);
+    //alert(node.innerText);
+    chrome.storage.local.get(['pointsData'], (result) => {
+      let pointsData = JSON.parse(JSON.stringify(result.pointsData));
+      pointsData[pointsData.length-1].points = parsePoints(node.innerText);
+      chrome.storage.local.set({ pointsData }, async () => { });
+     
+    });
+    chrome.storage.local.get(['users'], (result) => {
+      console.log(result.users);
+      const users = result.users || [];
+      if (users.length > 0) {
+        navigateAndExtract(JSON.stringify(users));
+      }
+      else{
+        chrome.storage.local.get(['pointsData'], (result) => {
+        console.log(result);
+        let pointsData = JSON.parse(JSON.stringify(result.pointsData));
+        console.log("Points----"+JSON.stringify(pointsData));
+        });
       }
     });
 
@@ -32,28 +45,58 @@ function findText() {
   }
 }
 
-function navigateAndExtract(ids) {
-  if (ids.length === 0) return;
+function navigateAndExtract(users) {
+  users = JSON.parse(users);
+  if (users.length === 0) return;
 
-  const id = ids.shift();
-  const url = `https://www.facebook.com/groups/135513406222343/user/${id}`;
+  const user = users.shift();
+  console.log(user);
 
-  document.location.href = url;
+  chrome.storage.local.get(['pointsData'], (result) => {
+    
+    let pointsData = [];
 
-  chrome.storage.local.set({ flag: 1 }, () => {
-    console.log("flag saved");
+    pointsData = JSON.parse(JSON.stringify(result.pointsData));
+    
+    const newpoints = {userId : user.userId , points : 0}
+
+    pointsData.push(newpoints)
+
+    chrome.storage.local.set({ pointsData }, async () => {
+    
+    const url = `https://www.facebook.com/groups/135513406222343/user/${user.fbuserId}`;
+      
+    document.location.href = url;
+      
+    chrome.storage.local.set({ flag: 1 }, () => {
+      console.log("flag saved");
+    });
+    
+    chrome.storage.local.set({ users }, () => {
+      console.log("users");
+    });
+       });
+   
   });
   
-  chrome.storage.local.set({ ids }, () => {
-    console.log("ids saved");
-  });
 
-  setTimeout(() => navigateAndExtract(ids), 2000);
+  //setTimeout(() => navigateAndExtract(users), 2000);
 }
 
+function parsePoints(str) {
+  
+  const cleanedString = str.replace(/[^0-9.]/g, '');
+  const number = parseFloat(cleanedString);
+  if (isNaN(number)) {
+    return 0;
+  }
+
+  return number;
+}
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'start') {
-    chrome.storage.local.get(['ids'], (result) => {
+    chrome.storage.local.get(['data'], (result) => {
+      console.log(result.data)
       const ids = result.ids || [];
       if (ids.length > 0) {
         navigateAndExtract(ids);
