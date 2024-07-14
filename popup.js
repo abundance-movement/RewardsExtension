@@ -1,5 +1,7 @@
-let getUsersAPI = 'http://localhost:4000/api/users/facebookIds'
-let jwtToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zYWZ5YW4xMDAwQGdtYWlsLmNvbSIsInN1YiI6Miwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzIwMTk0Mzk1LCJleHAiOjE3MjI3ODYzOTV9.DXUTC4B4_B-sQPynyqvzcyckP7LxGy2ZvvPzvCjdA1DtWxpheU-31jWZoP0yqFuDgj3yB6a7BSPurJpGTL31xHo9j8EtqAd0m1fjHMNenhOZVuzxXOt2hZMp6GHHycjAkPAXGxH2isGhKzs9loCLaEU1uqZSP5A6v2gKZvV0HcVGtU3p5XkYUf1DI8B6dV-j8TIWL1NtE3LUDVKNmmT_todhmKuuOd7Ki_aEo3B-2bWn1BCwfKfpqv0ThWDfUyGodYQXJbVkAh2KpVrVgzt3x1I-aCxTuK0403PPpZis983jlBKSPQu33WF3zIdf3zPVE5hOd1heFKxvlhd9VIBizQ'; 
+let getUsersAPI = 'http://api.sub.abundancemovement.io/api/users/facebookIds'
+let postUserPointsAPI = 'http://api.sub.abundancemovement.io/api/engagements/points/update-points'
+let jwtToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zYWZ5YW4xMDAwQGdtYWlsLmNvbSIsInN1YiI6MSwicm9sZSI6ImFkbWluIiwicGVyc29uYWxpdHlUeXBlIjoiSU5TUElSQVRPUiIsImlhdCI6MTcyMDk0MDY3MiwiZXhwIjoxNzIzNTMyNjcyfQ.RHNIeyRaL2BreUlsa_1iB7OiRn52J5KfymP-04hyCRlqPt4PZyUPd-bwQZ45H1I-O4FRNDGWLnuId-URf9TTaMY5qKkrM-TUySGMi3o9LjwuRfRiR5f7A3_yujlLAJxjOL6rzZFDAtgY7PUgjJAjBy7zxGCh-wXFACZO6P56p9i9AnSQVhUyBIuPbYeBDnACiMJhE-JlooV1yrW5p9Ns6gvK8qeFO-mzf4icXLNffSDaKzqfWa0Hout8IoW7ktp8sFYOYOzuab2plajDMK0liT5aHkTqmwfeNeLCC__1bme623aW1WRYpDEv8DEnRDZnIXQNvUnOdZj2WYis4aZ8Rg'; 
+
 document.getElementById('start-button').addEventListener('click', () => {
     const ids = fetchData();
   });
@@ -55,3 +57,35 @@ document.getElementById('start-button').addEventListener('click', () => {
       }
     });
   }
+  
+  function postData(data) {
+    fetch('http://api.sub.abundancemovement.io/api/engagements/points/update-points', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`,
+        'Content-Type': 'application/json'
+      },
+      //body: JSON.stringify(data)
+      body: data
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(responseData => {
+      console.log('Data posted successfully:', responseData);
+    })
+    .catch(error => {
+      console.error('Error posting data:', error);
+    });
+  }
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "postData") {
+      postData(message.pointsData)
+      sendResponse({status: "Function called"});
+    }
+  });
+  
