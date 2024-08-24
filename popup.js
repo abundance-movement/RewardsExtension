@@ -1,6 +1,6 @@
 let getUsersAPI = 'http://api.sub.abundancemovement.io/api/users/facebookIds'
 let postUserPointsAPI = 'http://api.sub.abundancemovement.io/api/engagements/points/update-points'
-let jwtToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zYWZ5YW4xMDAwQGdtYWlsLmNvbSIsInN1YiI6MSwicm9sZSI6ImFkbWluIiwicGVyc29uYWxpdHlUeXBlIjoiSU5TUElSQVRPUiIsImlhdCI6MTcyMDk0MDY3MiwiZXhwIjoxNzIzNTMyNjcyfQ.RHNIeyRaL2BreUlsa_1iB7OiRn52J5KfymP-04hyCRlqPt4PZyUPd-bwQZ45H1I-O4FRNDGWLnuId-URf9TTaMY5qKkrM-TUySGMi3o9LjwuRfRiR5f7A3_yujlLAJxjOL6rzZFDAtgY7PUgjJAjBy7zxGCh-wXFACZO6P56p9i9AnSQVhUyBIuPbYeBDnACiMJhE-JlooV1yrW5p9Ns6gvK8qeFO-mzf4icXLNffSDaKzqfWa0Hout8IoW7ktp8sFYOYOzuab2plajDMK0liT5aHkTqmwfeNeLCC__1bme623aW1WRYpDEv8DEnRDZnIXQNvUnOdZj2WYis4aZ8Rg'; 
+let jwtToken = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1zYWZ5YW4xMDAwQGdtYWlsLmNvbSIsInN1YiI6MSwicm9sZSI6ImFkbWluIiwicGVyc29uYWxpdHlUeXBlIjoiRU5FUkdJWkVSIiwiaWF0IjoxNzI0NDk0NzE0LCJleHAiOjE3MjUwMTMxMTR9.MaH_1mzIpf8LFuxRH0e7Au4XL7mALIU0TmhVxxd7W3cGk4EEaVmsVgaBMlVT-RmThbDZzUWpo4HoZYAF1xagy_QvabYHttUcopN9U5YEIP_oMnRf0ajnkL8S9Gx4X6m1lByHv0RfoTOKcjhUlsY3NW-U5bk9xevqIiABTmGbx0D4H1fJ5rqTcu15yf5fgsTYSRc1Y5t0Om9v331nPTCw_92HeVpgaqN2t1EFCZ1TCacSpxblOc3a9Q0_fmdZLGlA1DLMaYFE70GWfbIv2oBToW9F8ELr27cZSs46bsFinCijVLZQ-AmNXdypKp0cJG_WtqbWmD8hl55LYkIibmgaeA'; 
 
 document.getElementById('start-button').addEventListener('click', () => {
     const ids = fetchData();
@@ -59,7 +59,7 @@ document.getElementById('start-button').addEventListener('click', () => {
   }
   
   function postData(data) {
-    fetch('http://api.sub.abundancemovement.io/api/engagements/points/update-points', {
+    fetch(postUserPointsAPI, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${jwtToken}`,
@@ -82,10 +82,14 @@ document.getElementById('start-button').addEventListener('click', () => {
     });
   }
 
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "postData") {
-      postData(message.pointsData)
-      sendResponse({status: "Function called"});
-    }
-  });
+  // chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  //   if (message.action === "postData") {
+  //     postData(message.pointsData)
+  //     sendResponse({status: "Function called"});
+  //   }
+  //   if (message.action === "test") {
+  //     //postData(message.pointsData)
+  //     sendResponse({status: "TEST Function called"});
+  //   }
+  // });
   

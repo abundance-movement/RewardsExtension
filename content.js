@@ -14,6 +14,9 @@ function findText() {
   if (!node) {
     node = document.evaluate('/html/body/div[1]/div/div[1]/div/div[5]/div/div/div[3]/div[2]/div[1]/div[1]/div[2]/div/div/div/div[3]/div/div/div/div[1]/div/div/div/div/div/span/div/div', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   }
+  if (!node) {
+    node = document.evaluate('/html/body/div[1]/div/div/div[1]/div/div[3]/div/div/div[1]/div[1]/div[1]/div[1]/div[2]/div/div/div/div[3]/div/div/div/div[1]/div/div/div/div/div/span/div/div/span/span', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  }
 
   if (node) {
     console.log(`Extracted text for ID:`, node.innerText);
@@ -45,6 +48,26 @@ function findText() {
 
     chrome.storage.local.set({ flag: 0 }, () => {
       console.log("flag saved");
+    });
+  }
+  else{
+    chrome.storage.local.get(['users'], (result) => {
+      console.log(result.users);
+      const users = result.users || [];
+      if (users.length > 0) {
+        navigateAndExtract(JSON.stringify(users));
+      }
+      else{
+        chrome.storage.local.get(['pointsData'], (result) => {
+        console.log(result);
+        let pointsData = JSON.parse(JSON.stringify(result.pointsData));
+        console.log("Points----"+JSON.stringify(pointsData));
+        chrome.runtime.sendMessage({action: "postData", pointsData : JSON.stringify(pointsData)}, (response) => {
+          console.log(response);
+        });
+        //postData(pointsData);
+        });
+      }
     });
   }
 }
